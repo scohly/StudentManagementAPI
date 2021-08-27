@@ -17,4 +17,9 @@ public class StudentService {
     public List<Student> getAllStudents(){
         return studentRepo.findAll();
     }
+
+    public void addStudent(Student student) {
+        //add validation for checkEmail taken etc... if taken throw error
+        studentRepo.save(student);
+    }
 }
