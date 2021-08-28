@@ -27,6 +27,9 @@ public class StudentController {
         service.addStudent(student);
     }
 
+    @DeleteMapping
+    public void deleteStudent(@RequestBody long id) {service.removeStudent(id);}
+
     /*
     new Student(1L, "Billy Butcher", "billy@supssuck.com", Gender.MALE),
                 new Student(2L, "Hank", "hank@supssuck.com", Gender.MALE)

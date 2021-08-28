@@ -22,4 +22,11 @@ public class StudentService {
         //add validation for checkEmail taken etc... if taken throw error
         studentRepo.save(student);
     }
+
+    //use delete by id
+    public void removeStudent(long id) {
+        studentRepo.deleteById(id);
+    }
+
+
 }
