@@ -5,6 +5,9 @@ package com.example.demo.student;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @ToString
 @Getter
@@ -16,6 +19,7 @@ import javax.persistence.*;
 @Table
 public class Student {
     //PROPERTIES
+    //having the constraints are  cool and all...useless till we activate them, head over to controller
     @Id
     @SequenceGenerator(
             name = "student_sequence",
@@ -26,8 +30,11 @@ public class Student {
             generator = "student_sequence",
             strategy = GenerationType.SEQUENCE)
     private Long id;
+    @NotBlank
     private String name;
+    @Email      //we can use custom regex aka specify whether .edu/.gov/.com etc...
     private String email;
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
