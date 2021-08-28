@@ -1,5 +1,8 @@
+//note, when we add functions and functionality, we impor t them from the ./client file!
+//we added getAllStudents, deleteStudent...etc
+
 import {useState, useEffect} from 'react'
-import {getAllStudents} from "./client";
+import {deleteStudent,getAllStudents} from "./client";
 import {
     Layout,
     Menu,
@@ -7,7 +10,8 @@ import {
     Table,
     Spin,
     Empty,
-    Button, Badge, Tag, Avatar
+    Button, Badge, Tag, Avatar,
+    Radio, Popconfirm
 } from 'antd';
 
 import {
@@ -19,9 +23,11 @@ import {
     LoadingOutlined,
     PlusOutlined
 } from '@ant-design/icons';
+
 import StudentDrawerForm from "./StudentDrawerForm";
 
 import './App.css';
+import{errorNotification, successNotification} from"./Notification";
 
 const {Header, Content, Footer, Sider} = Layout;
 const {SubMenu} = Menu;
@@ -40,7 +46,14 @@ const TheAvatar = ({name}) => {
 
 }
 
-const columns = [
+//this is where we add functionality for add/remove/etc...
+const removeStudent = (studentId, callback) => {
+    deleteStudent(studentId).then(() => {
+        successNotification("Student deleted", )
+    });
+}
+
+const columns = fetchStudents => [
     {
         title: '',
         dataIndex: 'avatar',
@@ -67,6 +80,23 @@ const columns = [
         dataIndex: 'gender',
         key: 'gender',
     },
+    //we add fields for functionality...we added an actions column here so we can do edits/deletes
+    {
+        title: 'Ations',
+        key: 'actions',
+        render: (text, student) =>
+            <Radio.Group>
+                <Popconfirm
+                    placement='topRight'
+                    title={`Are you sure to delete ${student.name}`}
+                    onConfirm={() => removeStudent(student.id, fetchStudents)}
+                    okText='Yes'
+                    cancelText='No'>
+                    <Radio.Button value="small">Delete</Radio.Button>
+                </Popconfirm>
+                <Radio.Button value="small">Edit</Radio.Button>
+            </Radio.Group>
+    }
 ];
 
 const antIcon = <LoadingOutlined style={{fontSize: 24}} spin/>;
@@ -105,7 +135,7 @@ function App() {
             />
             <Table
                 dataSource={students}
-                columns={columns}
+                columns={columns(fetchStudents)}
                 bordered
                 title={() =>
                 <>
@@ -164,7 +194,7 @@ function App() {
                     {renderStudents()}
                 </div>
             </Content>
-            <Footer style={{textAlign: 'center'}}>By Amigoscode</Footer>
+            <Footer style={{textAlign: 'center'}}>By Soami</Footer>
         </Layout>
     </Layout>
 }

@@ -24,7 +24,8 @@ public class StudentService {
     }
 
     //use delete by id
-    public void removeStudent(long id) {
+    public void deleteStudent(long id) {
+        //when we do error  checking we need to check if the student exists before calling deleteby id
         studentRepo.deleteById(id);
     }
 
