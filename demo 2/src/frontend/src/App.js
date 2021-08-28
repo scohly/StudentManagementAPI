@@ -1,8 +1,5 @@
-//note, when we add functions and functionality, we impor t them from the ./client file!
-//we added getAllStudents, deleteStudent...etc
-
 import {useState, useEffect} from 'react'
-import {deleteStudent,getAllStudents} from "./client";
+import {deleteStudent, getAllStudents} from "./client";
 import {
     Layout,
     Menu,
@@ -10,7 +7,10 @@ import {
     Table,
     Spin,
     Empty,
-    Button, Badge, Tag, Avatar,
+    Button,
+    Badge,
+    Tag,
+    Avatar,
     Radio, Popconfirm
 } from 'antd';
 
@@ -23,34 +23,42 @@ import {
     LoadingOutlined,
     PlusOutlined
 } from '@ant-design/icons';
-
 import StudentDrawerForm from "./StudentDrawerForm";
 
 import './App.css';
-import{errorNotification, successNotification} from"./Notification";
+import {errorNotification, successNotification} from "./Notification";
+
 
 const {Header, Content, Footer, Sider} = Layout;
 const {SubMenu} = Menu;
 
 const TheAvatar = ({name}) => {
     let trim = name.trim();
-    if (name.trim().length ===0) {
-        return <Avatar icon={<UserOutlined/>} />
+    if (trim.length === 0) {
+        return <Avatar icon={<UserOutlined/>}/>
     }
-
     const split = trim.split(" ");
-    if(split.length === 1) {
+    if (split.length === 1) {
         return <Avatar>{name.charAt(0)}</Avatar>
     }
-    return <Avatar>{`${name.charAt(0)}${name.charAt(name.length-1)}`}</Avatar>
-
+    return <Avatar>
+        {`${name.charAt(0)}${name.charAt(name.length - 1)}`}
+    </Avatar>
 }
 
-//this is where we add functionality for add/remove/etc...
 const removeStudent = (studentId, callback) => {
     deleteStudent(studentId).then(() => {
-        successNotification("Student deleted", )
-    });
+        successNotification("Student deleted", `Student with ${studentId} was deleted`);
+        callback();
+    }).catch(err => {
+        err.response.json().then(res => {
+            console.log(res);
+            errorNotification(
+                "There was an issue",
+                `${res.message} [${res.status}] [${res.error}]`
+            )
+        });
+    })
 }
 
 const columns = fetchStudents => [
@@ -58,7 +66,8 @@ const columns = fetchStudents => [
         title: '',
         dataIndex: 'avatar',
         key: 'avatar',
-        render: (text, student) => <TheAvatar name={student.name}/>
+        render: (text, student) =>
+            <TheAvatar name={student.name}/>
     },
     {
         title: 'Id',
@@ -80,9 +89,8 @@ const columns = fetchStudents => [
         dataIndex: 'gender',
         key: 'gender',
     },
-    //we add fields for functionality...we added an actions column here so we can do edits/deletes
     {
-        title: 'Ations',
+        title: 'Actions',
         key: 'actions',
         render: (text, student) =>
             <Radio.Group>
@@ -113,8 +121,16 @@ function App() {
             .then(data => {
                 console.log(data);
                 setStudents(data);
-                setFetching(false);
-            })
+            }).catch(err => {
+                console.log(err.response)
+                err.response.json().then(res => {
+                    console.log(res);
+                    errorNotification(
+                        "There was an issue",
+                        `${res.message} [${res.status}] [${res.error}]`
+                    )
+                });
+            }).finally(() => setFetching(false))
 
     useEffect(() => {
         console.log("component is mounted");
@@ -126,36 +142,47 @@ function App() {
             return <Spin indicator={antIcon}/>
         }
         if (students.length <= 0) {
-            return <Empty/>;
+            return <>
+                <Button
+                    onClick={() => setShowDrawer(!showDrawer)}
+                    type="primary" shape="round" icon={<PlusOutlined/>} size="small">
+                    Add New Student
+                </Button>
+                <StudentDrawerForm
+                    showDrawer={showDrawer}
+                    setShowDrawer={setShowDrawer}
+                    fetchStudents={fetchStudents}
+                />
+                <Empty/>
+            </>
         }
         return <>
             <StudentDrawerForm
                 showDrawer={showDrawer}
                 setShowDrawer={setShowDrawer}
+                fetchStudents={fetchStudents}
             />
             <Table
                 dataSource={students}
                 columns={columns(fetchStudents)}
                 bordered
                 title={() =>
-                <>
-                    <Tag>Number of students</Tag>
-                    <Badge count={students.length} className="site-badge-count-4"/>
-                    <br/><br/>
-                    <Button
-                        onClick={() => setShowDrawer(!showDrawer)}
-                        type="primary" shape="round" icon={<PlusOutlined/>} size="small">
-                        Add New Student
-                    </Button>
-                </>
-
+                    <>
+                        <Tag>Number of students</Tag>
+                        <Badge count={students.length} className="site-badge-count-4"/>
+                        <br/><br/>
+                        <Button
+                            onClick={() => setShowDrawer(!showDrawer)}
+                            type="primary" shape="round" icon={<PlusOutlined/>} size="small">
+                            Add New Student
+                        </Button>
+                    </>
                 }
                 pagination={{pageSize: 50}}
                 scroll={{y: 500}}
                 rowKey={student => student.id}
             />
         </>
-
     }
 
     return <Layout style={{minHeight: '100vh'}}>
@@ -194,7 +221,7 @@ function App() {
                     {renderStudents()}
                 </div>
             </Content>
-            <Footer style={{textAlign: 'center'}}>By Soami</Footer>
+            <Footer style={{textAlign: 'center'}}>By Amigoscode</Footer>
         </Layout>
     </Layout>
 }
