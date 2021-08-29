@@ -31,11 +31,14 @@ public class Student {
             strategy = GenerationType.SEQUENCE)
     private Long id;
     @NotBlank
+    @Column(nullable = false)
     private String name;
-    @Email      //we can use custom regex aka specify whether .edu/.gov/.com etc...
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Gender gender;
 
     //create a constructor without ID as that will be created by DB
